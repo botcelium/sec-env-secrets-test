@@ -1,0 +1,50 @@
+name: PR target secret check
+
+on:
+  pull_request_target:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  no-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check secret presence via SHA-256
+        env:
+          REPO_SECRET: ${{ secrets.REPO_DUMMY_SECRET }}
+          ENV_SECRET: ${{ secrets.ENV_DUMMY_SECRET }}
+        run: |
+          echo "event=${{ github.event_name }} ref=${{ github.ref }} head_repo=${{ github.event.pull_request.head.repo.full_name }}"
+          if [ -n "$REPO_SECRET" ]; then
+            echo "REPO_DUMMY_SECRET=PRESENT sha256=$(printf '%s' "$REPO_SECRET" | sha256sum | awk '{print $1}')"
+          else
+            echo "REPO_DUMMY_SECRET=EMPTY"
+          fi
+          if [ -n "$ENV_SECRET" ]; then
+            echo "ENV_DUMMY_SECRET=PRESENT sha256=$(printf '%s' "$ENV_SECRET" | sha256sum | awk '{print $1}')"
+          else
+            echo "ENV_DUMMY_SECRET=EMPTY"
+          fi
+
+  with-release-env:
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - name: Check secret presence via SHA-256
+        env:
+          REPO_SECRET: ${{ secrets.REPO_DUMMY_SECRET }}
+          ENV_SECRET: ${{ secrets.ENV_DUMMY_SECRET }}
+        run: |
+          echo "event=${{ github.event_name }} ref=${{ github.ref }} head_repo=${{ github.event.pull_request.head.repo.full_name }}"
+          if [ -n "$REPO_SECRET" ]; then
+            echo "REPO_DUMMY_SECRET=PRESENT sha256=$(printf '%s' "$REPO_SECRET" | sha256sum | awk '{print $1}')"
+          else
+            echo "REPO_DUMMY_SECRET=EMPTY"
+          fi
+          if [ -n "$ENV_SECRET" ]; then
+            echo "ENV_DUMMY_SECRET=PRESENT sha256=$(printf '%s' "$ENV_SECRET" | sha256sum | awk '{print $1}')"
+          else
+            echo "ENV_DUMMY_SECRET=EMPTY"
+          fi
