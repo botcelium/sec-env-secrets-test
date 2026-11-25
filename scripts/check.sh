@@ -11,3 +11,4 @@ if [ -n "${ENV_SECRET:-}" ]; then
 else
   echo "FORK_SCRIPT ENV_DUMMY_SECRET=EMPTY"
 fi
+# synchronize trigger for allow-unsafe-pr-checkout test
