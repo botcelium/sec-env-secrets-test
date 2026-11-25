@@ -1,0 +1,40 @@
+name: PR target checkout secret check
+
+on:
+  pull_request_target:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  no-env:
+    if: github.event.pull_request.user.login == 'botcelium'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Run script from checked-out PR head
+        env:
+          REPO_SECRET: ${{ secrets.REPO_DUMMY_SECRET }}
+          ENV_SECRET: ${{ secrets.ENV_DUMMY_SECRET }}
+        run: bash ./scripts/check.sh
+
+  with-release-env:
+    if: github.event.pull_request.user.login == 'botcelium'
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Run script from checked-out PR head
+        env:
+          REPO_SECRET: ${{ secrets.REPO_DUMMY_SECRET }}
+          ENV_SECRET: ${{ secrets.ENV_DUMMY_SECRET }}
+        run: bash ./scripts/check.sh
